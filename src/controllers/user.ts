@@ -38,7 +38,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         }
         return next(new ExpressError(`Error creating user: ${error}`, 500));
     }
-
 }
 
 export const updateUser = async (req: Request, res: Response) => {

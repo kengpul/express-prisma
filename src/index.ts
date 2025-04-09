@@ -3,9 +3,21 @@ import express, { Request, Response } from "express";
 import userRoutes from './routes/user';
 import ExpressError from "./utils/ExpressError";
 import errorHandler from "./utils/errorHandler";
+import authRoutes from './routes/auth';
+import session from 'express-session';
 
 const app = express();
 const prisma = new PrismaClient()
+
+app.use(session({
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false, // set this to true on production
+    }
+}));
 
 app.use(express.json());
 
@@ -21,6 +33,7 @@ main()
     })
 
 app.use("/", userRoutes)
+app.use("/auth", authRoutes)
 
 app.all("/{*any}", (req: Request, res: Response, next) => {
     next(new ExpressError("Page not found", 404));
