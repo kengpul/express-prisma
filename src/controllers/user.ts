@@ -7,8 +7,23 @@ const prisma = new PrismaClient({
 });
 
 export const getAllUsers = async (req: Request, res: Response) => {
-    const users = await prisma.user.findMany();
-    res.json({ users });
+    const pageNumber = Number(req.query.pageNumber) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    const totalCount = await prisma.user.count();
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const users = await prisma.user.findMany({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+    });
+
+    res.json({
+        items: users,
+        totalCount,
+        pageSize,
+        totalPages
+    });
 }
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -44,8 +59,23 @@ export const deleteUser = async (req: Request, res: Response) => {
 }
 
 export const getAllRoles = async (req: Request, res: Response) => {
-    const roles = await prisma.role.findMany();
-    res.json({ roles });
+    const pageNumber = Number(req.query.pageNumber) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    const totalCount = await prisma.role.count();
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const roles = await prisma.role.findMany({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+    });
+
+    res.json({
+        items: roles,
+        totalCount,
+        pageSize,
+        totalPages
+    });
 }
 
 export const createRole = async (req: Request, res: Response) => {
@@ -73,8 +103,23 @@ export const deleteRole = async (req: Request, res: Response) => {
 }
 
 export const getAllBranches = async (req: Request, res: Response) => {
-    const branches = await prisma.branch.findMany();
-    res.json({ branches });
+    const pageNumber = Number(req.query.pageNumber) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    const totalCount = await prisma.branch.count();
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const branches = await prisma.branch.findMany({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+    });
+
+    res.json({
+        items: branches,
+        totalCount,
+        pageSize,
+        totalPages
+    });
 }
 
 export const createBranch = async (req: Request, res: Response) => {

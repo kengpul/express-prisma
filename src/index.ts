@@ -20,7 +20,6 @@ main()
         process.exit(1)
     })
 
-
 app.use("/", userRoutes)
 
 app.all("/{*any}", (req: Request, res: Response, next) => {
