@@ -1,12 +1,15 @@
+import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from "express";
-import { PrismaClient } from '@prisma/client'
 import userRoutes from './routes/user';
+import ExpressError from "./utils/ExpressError";
+import errorHandler from "./utils/errorHandler";
 
 const app = express();
 const prisma = new PrismaClient()
 
-async function main() { }
+app.use(express.json());
 
+async function main() { }
 main()
     .then(async () => {
         await prisma.$disconnect();
@@ -18,8 +21,13 @@ main()
     })
 
 
-app.use(express.json());
 app.use("/", userRoutes)
+
+app.all("/{*any}", (req: Request, res: Response, next) => {
+    next(new ExpressError("Page not found", 404));
+});
+
+app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

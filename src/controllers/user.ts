@@ -1,18 +1,29 @@
 import { PrismaClient } from "@prisma/client";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import ExpressError from "../utils/ExpressError";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+    errorFormat: "minimal",
+});
 
 export const getAllUsers = async (req: Request, res: Response) => {
     const users = await prisma.user.findMany();
     res.json({ users });
 }
 
-export const createUser = async (req: Request, res: Response) => {
-    const newUser = await prisma.user.create({
-        data: req.body
-    });
-    res.json({ newUser });
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const newUser = await prisma.user.create({
+            data: req.body
+        });
+        res.json({ user: newUser });
+    } catch (error) {
+        if (error.code === "P2002") {
+            return next(new ExpressError("User already exists", 400));
+        }
+        return next(new ExpressError(`Error creating user: ${error}`, 500));
+    }
+
 }
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -21,7 +32,7 @@ export const updateUser = async (req: Request, res: Response) => {
         where: { id },
         data: req.body
     });
-    res.json({ updatedUser });
+    res.json({ user: updatedUser });
 }
 
 export const deleteUser = async (req: Request, res: Response) => {
